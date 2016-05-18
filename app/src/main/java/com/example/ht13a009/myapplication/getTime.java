@@ -67,6 +67,8 @@ class getTime extends AsyncTask<URL, Void, String> {
     protected void onPostExecute(String resp){
 
         ArrayList<String> arr = new ArrayList<>();
+        // 例: 08:30:00を08:30に変更するためのsplit用配列
+        String[] time;
 
         try {
 
@@ -76,8 +78,16 @@ class getTime extends AsyncTask<URL, Void, String> {
 
             for (int i = 0; i < datas.length(); i++) {
                 JSONObject data = datas.getJSONObject(i);
+                time = data.getString("departureTime").split(":", 0);
 
-                arr.add(data.getString("departureTime") + " " + data.getString("note"));
+                if(data.getString("note").equals("null")){
+                    //arr.add(data.getString("departureTime"));
+                    arr.add(time[0] + ":" + time[1]);
+                }else{
+                    //arr.add(data.getString("departureTime") + " " + data.getString("note"));
+                    arr.add(time[0] + ":" + time[1] + " " + data.getString("note"));
+                }
+
 
             }
 

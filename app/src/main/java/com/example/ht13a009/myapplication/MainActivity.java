@@ -7,7 +7,6 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import java.net.MalformedURLException;
@@ -18,13 +17,14 @@ import java.util.Set;
 
 public class MainActivity extends Activity {
 
-    private TextView textView;
     private MyHttpConnection task;
     private HashMap<String,Integer> map;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //setTitle("OECU バス時刻表");
+        //requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_main);
 
         // activity_main.xmlに設定したコンポーネントをid指定で取得します。
@@ -56,8 +56,6 @@ public class MainActivity extends Activity {
                 ListView listView = (ListView) parent;
                 String routeName = (String) listView.getItemAtPosition(position);
                 Intent intent = new Intent(MainActivity.this, TimeActivity.class);
-                String key = null;
-                int valueId = -1;
 
                 map.get(routeName);
 

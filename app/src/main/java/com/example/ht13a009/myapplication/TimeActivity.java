@@ -26,6 +26,9 @@ public class TimeActivity extends AppCompatActivity {
         String Route = intent.getStringExtra("Route");
         int id = intent.getIntExtra("id", -1);
 
+        // Windowのタイトルを変更する
+        setTitle(Route);
+
         // 現在の時刻を取得
         Date date = new Date();
         // 表示形式を設定
@@ -41,7 +44,6 @@ public class TimeActivity extends AppCompatActivity {
         getTime task = new getTime(adapter);
 
         try {
-            //sdf.format(date)
             URL url = new URL("https://bus.oden.oecu.jp/api/1.3.1/Dias.json?route_id=" + id + "&date=" + sdf.format(date) );
             task.execute(url);
 
