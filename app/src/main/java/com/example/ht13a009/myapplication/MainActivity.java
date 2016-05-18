@@ -14,8 +14,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
 import java.util.Set;
 
 public class MainActivity extends Activity {
@@ -56,45 +54,20 @@ public class MainActivity extends Activity {
 
                 Set entries = map.entrySet();
                 ListView listView = (ListView) parent;
-                String item = (String) listView.getItemAtPosition(position);
+                String routeName = (String) listView.getItemAtPosition(position);
                 Intent intent = new Intent(MainActivity.this, TimeActivity.class);
                 String key = null;
                 int valueId = -1;
 
-                for(Iterator iterator = entries.iterator(); iterator.hasNext();){
-                    Map.Entry entry = (Map.Entry)iterator.next();
-                    if( item.equals(entry.getKey()) ){
+                map.get(routeName);
 
-                        key = (String)entry.getKey();
-                        valueId = (Integer) entry.getValue();
+                //intent.putExtra("key", "value"); でTimeActivityに文字を送る
+                intent.putExtra("Route", routeName);
+                intent.putExtra( "id", map.get(routeName));
+                startActivity(intent);
 
-                        //intent.putExtra("key", "value"); でTimeActivityに文字を送る
-                        //intent.putExtra("Route", (String) entry.getKey());
-                        //intent.putExtra( "id", (Integer) entry.getValue());
-                        //startActivity(intent);
-
-                        Toast.makeText(getApplicationContext(), " id" + id,
-                                Toast.LENGTH_LONG).show();
-
-                    }else{
-                        //Toast.makeText(getApplicationContext(), " entry.getKey()" + entry.getKey(),
-                          //      Toast.LENGTH_LONG).show();
-                    }
-
-                    //intent.putExtra("key", "value"); でTimeActivityに文字を送る
-                    intent.putExtra("Route", key);
-                    intent.putExtra( "id", (Integer) valueId);
-                    startActivity(intent);
-
-                }
-
-                /*
-                ListView listView = (ListView) parent;
-                String item = (String) listView.getItemAtPosition(position);
-                Toast.makeText(getApplicationContext(), item + " id" + id,
-                        Toast.LENGTH_LONG).show();
-                */
             }
+
         });
 
         listView.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {

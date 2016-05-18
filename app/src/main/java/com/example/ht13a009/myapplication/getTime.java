@@ -87,5 +87,6 @@ class getTime extends AsyncTask<URL, Void, String> {
 
         mAdapter.clear();
         mAdapter.addAll(arr);
+
     }
 }

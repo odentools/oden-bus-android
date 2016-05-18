@@ -42,7 +42,7 @@ public class TimeActivity extends AppCompatActivity {
 
         try {
             //sdf.format(date)
-            URL url = new URL("https://bus.oden.oecu.jp/api/1.3.1/Dias.json?route_id=1&date=2016/05/19" );
+            URL url = new URL("https://bus.oden.oecu.jp/api/1.3.1/Dias.json?route_id=" + id + "&date=" + sdf.format(date) );
             task.execute(url);
 
         } catch (MalformedURLException e) {
