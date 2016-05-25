@@ -41,7 +41,7 @@ public class TimeActivity extends AppCompatActivity {
         ListView listView = (ListView) findViewById(R.id.listView2);
         listView.setAdapter(adapter);
 
-        getTime task = new getTime(adapter);
+        GetTime task = new GetTime(adapter);
 
         try {
             URL url = new URL("https://bus.oden.oecu.jp/api/1.3.1/Dias.json?route_id=" + id + "&date=" + sdf.format(date) );

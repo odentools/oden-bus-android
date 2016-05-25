@@ -1,8 +1,8 @@
 package com.example.ht13a009.myapplication;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
 
-public class MainActivity extends Activity {
+public class MainActivity extends AppCompatActivity {
 
     private MyHttpConnection task;
     private HashMap<String,Integer> map;
