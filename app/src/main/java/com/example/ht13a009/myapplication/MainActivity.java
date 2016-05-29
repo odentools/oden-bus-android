@@ -23,8 +23,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //setTitle("OECU バス時刻表");
-        //requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_main);
 
         // activity_main.xmlに設定したコンポーネントをid指定で取得します。
@@ -56,8 +54,6 @@ public class MainActivity extends AppCompatActivity {
                 ListView listView = (ListView) parent;
                 String routeName = (String) listView.getItemAtPosition(position);
                 Intent intent = new Intent(MainActivity.this, TimeActivity.class);
-
-                map.get(routeName);
 
                 //intent.putExtra("key", "value"); でTimeActivityに文字を送る
                 intent.putExtra("Route", routeName);

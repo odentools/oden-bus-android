@@ -50,12 +50,6 @@ class TimeLag {
         // 表示
         String[] timeLag = sdf.format(b.getTime()).split(":");
 
-        /*
-        int hour = Integer.parseInt(timeLag[0]);
-        int minute = Integer.parseInt(timeLag[1]);
-        int second = Integer.parseInt(timeLag[2]);
-        */
-
         return timeLag;
     }
 }
