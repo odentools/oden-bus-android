@@ -1,7 +1,10 @@
 package com.example.ht13a009.myapplication;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
@@ -18,15 +21,24 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 
-public class TimeActivity extends AppCompatActivity {
+public class TimeActivity extends AppCompatActivity implements Runnable{
 
     private boolean allFlag = false;
     private HashMap<String, Integer> map;
+
+    ProgressDialog progressDialog;
+    Thread thread;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_time);
+
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setTitle("Loading now");
+        progressDialog.setMessage("Please wait 5 seconds");
+        //progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
 
         // 現在のintentを取得する
         Intent intent = getIntent();
@@ -184,6 +196,31 @@ public class TimeActivity extends AppCompatActivity {
             }
         });
 
+        progressDialog.show();
+
+        thread = new Thread(this);
+        thread.start();
+
     }
+
+    // progressDialog
+    @Override
+    public void run() {
+        try {
+            thread.sleep(5000);
+        } catch (InterruptedException e) {
+            // TODO 自動生成された catch ブロック
+            e.printStackTrace();
+        }
+        progressDialog.dismiss();
+        handler.sendEmptyMessage(0);
+    }
+
+    private Handler handler = new Handler() {
+        public void handleMessage(Message msg) {
+            Toast.makeText(getApplicationContext(), "slept 5 seconds",
+                    Toast.LENGTH_LONG).show();
+        }
+    };
 
 }
