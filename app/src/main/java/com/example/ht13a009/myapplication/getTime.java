@@ -20,15 +20,16 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 
-class GetTime extends AsyncTask<URL, Void, String> {
+class GetTime extends AsyncTask<Object, Void, String> {
 
-    ArrayAdapter<String> mAdapter;
-    Context context;
-    String route;
+    private ArrayAdapter<String> mAdapter;
+    private ArrayList<String> diasArr;
+    private Context context;
+    private String route;
 
-    int hour;
-    int minute;
-    int second;
+    private int hour;
+    private int minute;
+    private int second;
 
     private boolean allButton = false;
     //通知時間
@@ -42,7 +43,14 @@ class GetTime extends AsyncTask<URL, Void, String> {
     // 通知判定
     private boolean notice = false;
 
-    Runnable restTime = null;
+    private Runnable restTime = null;
+
+    // パラメータ[1] - コンテキスト
+    private Context mContext = null;
+    // パラメータ[2] - UI制御用ハンドラ
+    //private Handler mHandler = null;
+    // パラメータ[3] - 完了処理として実行したいRunnable
+    private Runnable finallyRunnable = null;
 
     public GetTime(ArrayAdapter<String> adapter, Context applicationContext, String Route) {
         super();
@@ -52,11 +60,16 @@ class GetTime extends AsyncTask<URL, Void, String> {
     }
 
     @Override
-    protected String doInBackground(URL... url) {
+    protected String doInBackground(Object... objects) {
         String result = "";
         HttpURLConnection conn = null;
+        URL url = (URL) objects[0];
+        mContext = (Context) objects[1];
+        //mHandler = (Handler) objects[2];
+        finallyRunnable = (Runnable) objects[3];
+
         try {
-            conn = (HttpURLConnection) url[0].openConnection();
+            conn = (HttpURLConnection) url.openConnection();
             conn.setReadTimeout(10000);
             conn.setConnectTimeout(15000);
             conn.setRequestMethod("GET");
@@ -95,7 +108,6 @@ class GetTime extends AsyncTask<URL, Void, String> {
 
         final int notificationId = 001;
 
-        // スレッドUI操作用ハンドラ
         final Handler mHandler = new Handler();
 
         // テキストオブジェクト
@@ -104,7 +116,7 @@ class GetTime extends AsyncTask<URL, Void, String> {
             @Override
             public void run() {
 
-                ArrayList<String> diasArr = new ArrayList<>();
+                diasArr = new ArrayList<>();
                 // 例: 08:30:00を08:30に変更するためのsplit用配列
                 String[] time;
 
@@ -160,14 +172,14 @@ class GetTime extends AsyncTask<URL, Void, String> {
                             // 1分前に通知
                             if (hour == (noticeTime / 60) && minute == (noticeTime % 60) && second == 0) {
                                 NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
-                                builder.setSmallIcon(R.mipmap.ic_launcher);
+                                builder.setSmallIcon(R.mipmap.oecu_bus);
 
                                 if (Integer.parseInt(timeLag[0]) == 0) {
                                     builder.setContentTitle(route);
-                                    builder.setContentText("バス発車まで残り" + Integer.parseInt(timeLag[1]) + "分です．");
+                                    builder.setContentText("バス発車まで残り" + minute + "分です．");
                                 } else {
                                     builder.setContentTitle(route);
-                                    builder.setContentText("バス発車まで残り" + Integer.parseInt(timeLag[0]) + "時です．");
+                                    builder.setContentText("バス発車まで残り" + hour + "時です．");
                                 }
 
                                 // builder.setSubText("SubText");
@@ -239,7 +251,7 @@ class GetTime extends AsyncTask<URL, Void, String> {
 
                 // アダプターでリストを表示
                 mAdapter.clear();
-                mAdapter.addAll(diasArr);
+                mAdapter.addAll(diasArr);;
 
                 // 1秒ごとにrestTime関数を再起動
                 mHandler.removeCallbacks(restTime);
@@ -247,6 +259,10 @@ class GetTime extends AsyncTask<URL, Void, String> {
 
             }
         };
+
+        if (finallyRunnable != null){
+            mHandler.post(finallyRunnable);
+        }
 
         // run関数を初めて呼び出す時に用いる
         mHandler.postDelayed(restTime, 1000);
@@ -282,10 +298,5 @@ class GetTime extends AsyncTask<URL, Void, String> {
         return same;
     }
 
-    /*
-    void setSelect(int arr[]){
-
-    }
-    */
 
 }

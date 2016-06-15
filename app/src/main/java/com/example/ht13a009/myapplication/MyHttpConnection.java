@@ -1,6 +1,8 @@
 package com.example.ht13a009.myapplication;
 
+import android.content.Context;
 import android.os.AsyncTask;
+import android.os.Handler;
 import android.widget.ArrayAdapter;
 
 import org.json.JSONArray;
@@ -17,10 +19,18 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-class MyHttpConnection extends AsyncTask<URL, Void, String> {
+class MyHttpConnection extends AsyncTask<Object, Void, String> {
 
-    ArrayAdapter<String> mAdapter;
-    Map<String, Integer> map = new HashMap<String, Integer>();
+    private ArrayAdapter<String> mAdapter;
+    private Map<String, Integer> map = new HashMap<String, Integer>();
+    private ArrayList<String> arr = new ArrayList<>();
+
+    // パラメータ[1] - コンテキスト
+    private Context mContext = null;
+    // パラメータ[2] - UI制御用ハンドラ
+    private Handler mHandler = null;
+    // パラメータ[3] - 完了処理として実行したいRunnable
+    private Runnable finallyRunnable = null;
 
     public MyHttpConnection(ArrayAdapter<String> adapter , HashMap<String , Integer> hashMap) {
         super();
@@ -29,11 +39,16 @@ class MyHttpConnection extends AsyncTask<URL, Void, String> {
     }
 
     @Override
-    protected String doInBackground(URL... url) {
+    protected String doInBackground(Object... objects) {
         String result = "";
         HttpURLConnection conn = null;
+        URL url = (URL) objects[0];
+        mContext = (Context) objects[1];
+        mHandler = (Handler) objects[2];
+        finallyRunnable = (Runnable) objects[3];
+
         try {
-            conn = (HttpURLConnection) url[0].openConnection();
+            conn = (HttpURLConnection) url.openConnection();
             conn.setReadTimeout(10000);
             conn.setConnectTimeout(15000);
             conn.setRequestMethod("GET");
@@ -70,8 +85,6 @@ class MyHttpConnection extends AsyncTask<URL, Void, String> {
     @Override
     protected void onPostExecute(String resp){
 
-        ArrayList<String> arr = new ArrayList<>();
-
         try {
 
             JSONObject json = new JSONObject(resp);
@@ -92,7 +105,17 @@ class MyHttpConnection extends AsyncTask<URL, Void, String> {
             e.printStackTrace();
         }
 
-        mAdapter.clear();
-        mAdapter.addAll(arr);
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                mAdapter.clear();
+                mAdapter.addAll(arr);
+            }
+        });
+
+        if(finallyRunnable != null){
+            mHandler.post(finallyRunnable);
+        }
+
     }
 }

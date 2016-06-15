@@ -4,7 +4,6 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
@@ -21,24 +20,15 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 
-public class TimeActivity extends AppCompatActivity implements Runnable{
+public class TimeActivity extends AppCompatActivity {
 
     private boolean allFlag = false;
     private HashMap<String, Integer> map;
-
-    ProgressDialog progressDialog;
-    Thread thread;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_time);
-
-        progressDialog = new ProgressDialog(this);
-        progressDialog.setTitle("Loading now");
-        progressDialog.setMessage("Please wait 5 seconds");
-        //progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
 
         // 現在のintentを取得する
         Intent intent = getIntent();
@@ -49,11 +39,6 @@ public class TimeActivity extends AppCompatActivity implements Runnable{
 
         // Windowのタイトルを変更する
         setTitle(Route);
-
-        // 現在の時刻を取得
-        Date date = new Date();
-        // 表示形式を設定
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy'/'MM'/'dd");
 
         map = new HashMap<String, Integer>();
 
@@ -81,18 +66,8 @@ public class TimeActivity extends AppCompatActivity implements Runnable{
             }
         }
 
-
         final GetTime task = new GetTime(adapter, getApplicationContext(), Route);
-
-        try {
-            URL url = new URL("https://bus.oden.oecu.jp/api/1.3.1/Dias.json?route_id=" + id + "&date=" + "2016/05/28");
-            //sdf.format(date) );
-            task.execute(url);
-
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        }
-
+        loadTimeList(task, id);
 
         // allボタン押した時全部の通知
         assert allButton != null;
@@ -195,32 +170,40 @@ public class TimeActivity extends AppCompatActivity implements Runnable{
                 Toast.makeText(getApplicationContext(), "nothing", Toast.LENGTH_SHORT).show();
             }
         });
-
-        progressDialog.show();
-
-        thread = new Thread(this);
-        thread.start();
-
     }
 
-    // progressDialog
-    @Override
-    public void run() {
+    public void loadTimeList(final GetTime task, int id){
+
+        // 現在の時刻を取得
+        Date date = new Date();
+        // 表示形式を設定
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy'/'MM'/'dd");
+
+        // ダイアログを表示
+        final ProgressDialog dialog = new ProgressDialog(this);
+        dialog.setIndeterminate(true);
+        dialog.setTitle("Loading now...");
+        dialog.setMessage("Please wait a moment");
+        dialog.show();
+
+        // 取得処理を開始
+        final Handler ui_handler = new Handler();
+
+        Runnable finally_runnable = new Runnable() {
+            @Override
+            public void run() {
+                dialog.hide();
+            }
+        };
+
         try {
-            thread.sleep(5000);
-        } catch (InterruptedException e) {
-            // TODO 自動生成された catch ブロック
+            URL url = new URL("https://bus.oden.oecu.jp/api/1.3.1/Dias.json?route_id=" + id + "&date=" + sdf.format(date));
+            task.execute(url, TimeActivity.this, ui_handler, finally_runnable);
+
+        } catch (MalformedURLException e) {
             e.printStackTrace();
         }
-        progressDialog.dismiss();
-        handler.sendEmptyMessage(0);
-    }
 
-    private Handler handler = new Handler() {
-        public void handleMessage(Message msg) {
-            Toast.makeText(getApplicationContext(), "slept 5 seconds",
-                    Toast.LENGTH_LONG).show();
-        }
-    };
+    }
 
 }
