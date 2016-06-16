@@ -93,12 +93,12 @@ class MyHttpConnection extends AsyncTask<Object, Void, String> {
 
             for (int i = 0; i < datas.length(); i++) {
                 JSONObject data = datas.getJSONObject(i);
-
-                arr.add(data.getString("routePrefix") + " " + data.getString("routeName"));
-                // ルート名とid番号を連想配列に格納
-                map.put(data.getString("routePrefix") + " "
-                        + data.getString("routeName"), data.getInt("id"));
-
+                if(data.getInt("numOfBusesOnDay") != 0){
+                    arr.add(data.getString("routePrefix") + " " + data.getString("routeName"));
+                    // ルート名とid番号を連想配列に格納
+                    map.put(data.getString("routePrefix") + " "
+                            + data.getString("routeName"), data.getInt("id"));
+                }
             }
 
         } catch (JSONException e) {
