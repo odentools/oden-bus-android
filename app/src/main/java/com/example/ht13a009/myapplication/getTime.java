@@ -2,9 +2,11 @@ package com.example.ht13a009.myapplication;
 
 import android.app.Notification;
 import android.content.Context;
+import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.support.v4.app.NotificationManagerCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.NotificationCompat;
 import android.widget.ArrayAdapter;
 
@@ -169,17 +171,21 @@ class GetTime extends AsyncTask<Object, Void, String> {
 
                             // System.out.println("noticeTime.hour: " + (noticeTime/60) + " noticeTime.minute: " + (noticeTime % 60) );
 
-                            // 1分前に通知
+                            // ○○前に通知
                             if (hour == (noticeTime / 60) && minute == (noticeTime % 60) && second == 0) {
+                            //if (hour == 0 && minute == 9 && second == 0) {
                                 NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
                                 builder.setSmallIcon(R.mipmap.oecu_bus);
+                                builder.setLargeIcon(BitmapFactory.decodeResource(context.getResources(), R.mipmap.oecu_bus));
+                                // アイコンの背景色
+                                builder.setColor(ContextCompat.getColor(context, R.color.colorPrimary));
 
                                 if (Integer.parseInt(timeLag[0]) == 0) {
                                     builder.setContentTitle(route);
                                     builder.setContentText("バス発車まで残り" + minute + "分です．");
                                 } else {
                                     builder.setContentTitle(route);
-                                    builder.setContentText("バス発車まで残り" + hour + "時です．");
+                                    builder.setContentText("バス発車まで残り" + hour + "時間です．");
                                 }
 
                                 // builder.setSubText("SubText");
@@ -213,12 +219,10 @@ class GetTime extends AsyncTask<Object, Void, String> {
 
                     }
 
-                    /*
                     System.out.println("listLength: " + listLength);
                     System.out.println("diasArr.size(): " + diasArr.size());
                     System.out.println("clickIdArr.size():" + clickIdArr.size());
                     System.out.println("clickIdArr" + clickIdArr);
-                    */
 
                     // リスト数が増減した時，クリックしたリストIDの番号を変更する
                     if (listLength == -1) {
@@ -284,6 +288,9 @@ class GetTime extends AsyncTask<Object, Void, String> {
 
     // クリックしたIDがclickIdArrにあったら削除，なかったら追加する関数
     boolean setClickId(int id) {
+
+        System.out.println("setClickId");
+
         same = false;
         for (int i = 0; i < clickIdArr.size(); i++) {
             if (id == clickIdArr.get(i)) {
@@ -293,6 +300,7 @@ class GetTime extends AsyncTask<Object, Void, String> {
         }
 
         if (!same) {
+            System.out.println("clickIdArr.add");
             clickIdArr.add(id);
         }
         return same;

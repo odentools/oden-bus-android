@@ -77,12 +77,12 @@ public class TimeActivity extends AppCompatActivity {
                 if (allFlag) {
                     allFlag = false;
                     task.setAllButton(allFlag);
-                    Toast.makeText(getApplicationContext(), "全ての通知をoffにしました",
+                    Toast.makeText(getApplicationContext(), "全ての通知をoff",
                             Toast.LENGTH_LONG).show();
                 } else {
                     allFlag = true;
                     task.setAllButton(allFlag);
-                    Toast.makeText(getApplicationContext(), "全ての通知をonにしました",
+                    Toast.makeText(getApplicationContext(), "全ての通知をon",
                             Toast.LENGTH_LONG).show();
                     ;
                 }
@@ -97,10 +97,10 @@ public class TimeActivity extends AppCompatActivity {
                 // クリックされたポジションをGetTime.javaに渡す
                 boolean flag = task.setClickId(position);
                 if (flag) {
-                    Toast.makeText(getApplicationContext(), "通知offにしました",
+                    Toast.makeText(getApplicationContext(), "通知off",
                             Toast.LENGTH_LONG).show();
                 } else {
-                    Toast.makeText(getApplicationContext(), "通知onにしました",
+                    Toast.makeText(getApplicationContext(), "通知on",
                             Toast.LENGTH_LONG).show();
                 }
 
@@ -160,7 +160,7 @@ public class TimeActivity extends AppCompatActivity {
                 task.setNoticeTime(minute);
 
                 Toast.makeText(getApplicationContext(),
-                        "通知時間を" + myItem + "に設定しました" , Toast.LENGTH_SHORT).show();
+                        myItem  , Toast.LENGTH_SHORT).show();
 
             }
 
