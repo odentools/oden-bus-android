@@ -11,6 +11,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -19,7 +20,6 @@ import android.widget.Toast;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 
@@ -60,10 +60,9 @@ public class TimeActivity extends AppCompatActivity {
 
         // アダプタを生成してリストビューへセット
         ArrayAdapter<String> adapter = new ArrayAdapter<String>
-                (this, android.R.layout.simple_list_item_1, new ArrayList());
+                (this, R.layout.row, R.id.row_textview1);
         ListView listView = (ListView) findViewById(R.id.listView2);
         listView.setAdapter(adapter);
-
 
         prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         String defalutNoticeTime = prefs.getString("defalutNoticeTime", "@10分");
@@ -112,9 +111,23 @@ public class TimeActivity extends AppCompatActivity {
                 // クリックされたポジションをGetTime.javaに渡す
                 boolean flag = task.setClickId(position);
                 if (flag) {
+
+                    // アイコンを非表示
+                    ImageView appInfoImage = (ImageView)view.findViewById(R.id.row_imageview);
+                    appInfoImage.setVisibility(View.INVISIBLE);
+                    // 色を白色に変更
+                    view.setBackgroundColor(getResources().getColor(R.color.white));
+
                     Toast.makeText(getApplicationContext(), "通知off",
                             Toast.LENGTH_LONG).show();
                 } else {
+
+                    // アイコンを表示
+                    ImageView appInfoImage = (ImageView)view.findViewById(R.id.row_imageview);
+                    appInfoImage.setVisibility(View.VISIBLE);
+                    // 色を薄水色に変更
+                    view.setBackgroundColor(getResources().getColor(R.color.lightBlue));
+
                     Toast.makeText(getApplicationContext(), "通知on",
                             Toast.LENGTH_LONG).show();
                 }
@@ -126,17 +139,25 @@ public class TimeActivity extends AppCompatActivity {
             //リスト項目が選択された時の処理
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+                /*
                 ListView listView = (ListView) parent;
                 String item = (String) listView.getItemAtPosition(position);
                 Toast.makeText(getApplicationContext(), item + " selected",
                         Toast.LENGTH_LONG).show();
+                */
+
             }
 
             //リスト項目がなにも選択されていない時の処理
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
+
+                /*
                 Toast.makeText(getApplicationContext(), "no item selected",
                         Toast.LENGTH_LONG).show();
+                */
+
             }
         });
 
@@ -144,11 +165,16 @@ public class TimeActivity extends AppCompatActivity {
         listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+
+                /*
                 ListView listView = (ListView) parent;
                 String item = (String) listView.getItemAtPosition(position);
                 Toast.makeText(getApplicationContext(), item + " long clicked",
                         Toast.LENGTH_LONG).show();
+                */
+
                 return false;
+
             }
         });
 

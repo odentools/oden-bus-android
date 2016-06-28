@@ -11,11 +11,9 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
 
@@ -31,7 +29,7 @@ public class MainActivity extends AppCompatActivity {
         // activity_main.xmlに設定したコンポーネントをid指定で取得します。
         // アダプタを生成してリストビューへセット
         ArrayAdapter<String> adapter = new ArrayAdapter<String>
-                (this, android.R.layout.simple_list_item_1, new ArrayList());
+                (this, R.layout.list_item2, R.id.list_item_textView);
         ListView listView = (ListView) findViewById(R.id.listView);
         listView.setAdapter(adapter);
         map = new HashMap<String, Integer>();
@@ -61,17 +59,21 @@ public class MainActivity extends AppCompatActivity {
             //リスト項目が選択された時の処理
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                /*
                 ListView listView = (ListView) parent;
                 String item = (String) listView.getItemAtPosition(position);
                 Toast.makeText(getApplicationContext(), item + " selected",
                         Toast.LENGTH_LONG).show();
+                */
             }
 
             //リスト項目がなにも選択されていない時の処理
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
+                /*
                 Toast.makeText(getApplicationContext(), "no item selected",
                         Toast.LENGTH_LONG).show();
+                */
             }
         });
 
@@ -79,10 +81,13 @@ public class MainActivity extends AppCompatActivity {
         listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+
+                /*
                 ListView listView = (ListView) parent;
                 String item = (String) listView.getItemAtPosition(position);
                 Toast.makeText(getApplicationContext(), item + " long clicked",
                         Toast.LENGTH_LONG).show();
+                */
                 return false;
             }
         });
