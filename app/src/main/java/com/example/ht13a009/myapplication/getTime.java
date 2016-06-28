@@ -42,6 +42,8 @@ class GetTime extends AsyncTask<Object, Void, String> {
     private ArrayList<Integer> clickIdArr = new ArrayList<Integer>();
     // クリックしたリストのIDと同じものがclickIdArrにあるかどうかの判定する変数
     private boolean same = false;
+    private boolean same2 = false;
+
     // 通知判定
     private boolean notice = false;
 
@@ -179,9 +181,9 @@ class GetTime extends AsyncTask<Object, Void, String> {
 
                             // ○○前に通知
                             if (hour == (noticeTime / 60) && minute == (noticeTime % 60) && second == 0) {
-                            //if (hour == 0 && minute == 9 && second == 0) {
+                            //if (hour == 7 && minute == 27 && second == 0) {
                                 NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
-                                builder.setSmallIcon(R.mipmap.oecu_bus);
+                                builder.setSmallIcon(R.mipmap.oecu_bus_background_transmission);
                                 builder.setLargeIcon(BitmapFactory.decodeResource(context.getResources(), R.mipmap.oecu_bus));
                                 // アイコンの背景色
                                 builder.setColor(ContextCompat.getColor(context, R.color.colorPrimary));
@@ -249,8 +251,9 @@ class GetTime extends AsyncTask<Object, Void, String> {
                     System.out.println("listLength: " + listLength);
                     System.out.println("diasArr.size(): " + diasArr.size());
                     System.out.println("clickIdArr.size():" + clickIdArr.size());
-                    System.out.println("clickIdArr" + clickIdArr);
                     */
+
+                    System.out.println("clickIdArr" + clickIdArr);
 
                     // リスト数が増減した時，クリックしたリストIDの番号を変更する
                     if (listLength == -1) {
@@ -302,7 +305,7 @@ class GetTime extends AsyncTask<Object, Void, String> {
     }
 
     // 全通知するか判定する関数
-    void setAllButton(boolean flag) {
+    public void setAllButton(boolean flag) {
         allButton = flag;
         if (!allButton) {
             clickIdArr.clear();
@@ -310,12 +313,12 @@ class GetTime extends AsyncTask<Object, Void, String> {
     }
 
     // 通知時間
-    void setNoticeTime(int setMinute) {
+    public void setNoticeTime(int setMinute) {
         noticeTime = setMinute;
     }
 
     // クリックしたIDがclickIdArrにあったら削除，なかったら追加する関数
-    boolean setClickId(int id) {
+    public boolean setClickId(int id) {
 
         System.out.println("setClickId");
 
@@ -334,5 +337,27 @@ class GetTime extends AsyncTask<Object, Void, String> {
         return same;
     }
 
+    // TimeActivityのallFlagがtrueの時，clickIdArrにlistViewのviewのidを全て格納する関数
+    public void setClickIdAll() {
+
+        if(clickIdArr.isEmpty()){
+            System.out.println("clickIdArr.isEmpty()");
+            for(int i=0; i < diasArr.size(); i++){
+                clickIdArr.add(i);
+            }
+        } else {
+            for(int i=0; i < diasArr.size(); i++){
+                for(int j = 0; j < clickIdArr.size(); j++){
+                    if( i == clickIdArr.get(j)){
+                        same2 = true;
+                    }
+                }
+                if(!same2){
+                    clickIdArr.add(i);
+                }
+                same2 = false;
+            }
+        }
+    }
 
 }

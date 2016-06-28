@@ -12,6 +12,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -25,9 +26,13 @@ import java.util.HashMap;
 
 public class TimeActivity extends AppCompatActivity {
 
-    private boolean allFlag = false;
     private HashMap<String, Integer> map;
     private SharedPreferences prefs;
+    private ImageView appInfoImage;
+    private ListView listView;
+
+    private boolean allFlag = false;
+    private boolean singleFlag = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,7 +66,7 @@ public class TimeActivity extends AppCompatActivity {
         // アダプタを生成してリストビューへセット
         ArrayAdapter<String> adapter = new ArrayAdapter<String>
                 (this, R.layout.row, R.id.row_textview1);
-        ListView listView = (ListView) findViewById(R.id.listView2);
+        listView = (ListView) findViewById(R.id.listView2);
         listView.setAdapter(adapter);
 
         prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
@@ -88,14 +93,31 @@ public class TimeActivity extends AppCompatActivity {
         allButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 if (allFlag) {
                     allFlag = false;
                     task.setAllButton(allFlag);
+
+                    // ベルのアイコンをlistViewの全てのviewで表示
+                    for(int i = 0; i < listView.getChildCount(); i++){
+                        LinearLayout linearLayout = (LinearLayout)listView.getChildAt(i);
+                        linearLayout.findViewById(R.id.row_imageview).setVisibility(View.INVISIBLE);
+                    }
+
                     Toast.makeText(getApplicationContext(), "全ての通知をoff",
                             Toast.LENGTH_LONG).show();
                 } else {
                     allFlag = true;
                     task.setAllButton(allFlag);
+                    task.setClickIdAll();
+
+                    // ベルのアイコンをlistViewの全てのviewで表示
+                    for(int i = 0; i < listView.getChildCount(); i++){
+                        LinearLayout linearLayout = (LinearLayout)listView.getChildAt(i);
+                        linearLayout.findViewById(R.id.row_imageview).setVisibility(View.VISIBLE);
+                        linearLayout.performClick();
+                    }
+
                     Toast.makeText(getApplicationContext(), "全ての通知をon",
                             Toast.LENGTH_LONG).show();
                     ;
@@ -108,25 +130,27 @@ public class TimeActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> list, View view, int position, long id) {
 
+                System.out.println("position: " + position);
+
                 // クリックされたポジションをGetTime.javaに渡す
-                boolean flag = task.setClickId(position);
-                if (flag) {
+                singleFlag = task.setClickId(position);
+                if (singleFlag) {
 
                     // アイコンを非表示
-                    ImageView appInfoImage = (ImageView)view.findViewById(R.id.row_imageview);
+                    appInfoImage = (ImageView)view.findViewById(R.id.row_imageview);
                     appInfoImage.setVisibility(View.INVISIBLE);
                     // 色を白色に変更
-                    view.setBackgroundColor(getResources().getColor(R.color.white));
+                    //view.setBackgroundColor(getResources().getColor(R.color.white));
 
                     Toast.makeText(getApplicationContext(), "通知off",
                             Toast.LENGTH_LONG).show();
                 } else {
 
                     // アイコンを表示
-                    ImageView appInfoImage = (ImageView)view.findViewById(R.id.row_imageview);
+                    appInfoImage = (ImageView)view.findViewById(R.id.row_imageview);
                     appInfoImage.setVisibility(View.VISIBLE);
                     // 色を薄水色に変更
-                    view.setBackgroundColor(getResources().getColor(R.color.lightBlue));
+                    //view.setBackgroundColor(getResources().getColor(R.color.lightBlue));
 
                     Toast.makeText(getApplicationContext(), "通知on",
                             Toast.LENGTH_LONG).show();
