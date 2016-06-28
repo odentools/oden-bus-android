@@ -53,6 +53,10 @@ class GetTime extends AsyncTask<Object, Void, String> {
     //private Handler mHandler = null;
     // パラメータ[3] - 完了処理として実行したいRunnable
     private Runnable finallyRunnable = null;
+    // パラメータ[4] - 忍ケ丘に到着する時間を表示
+    private boolean ShinobuArrivalTime;
+    // パラメータ[5] - 忍ケ丘だけ表示
+    private boolean ShinobuOnly;
 
     public GetTime(ArrayAdapter<String> adapter, Context applicationContext, String Route) {
         super();
@@ -69,6 +73,8 @@ class GetTime extends AsyncTask<Object, Void, String> {
         mContext = (Context) objects[1];
         //mHandler = (Handler) objects[2];
         finallyRunnable = (Runnable) objects[3];
+        ShinobuArrivalTime = (Boolean) objects[4];
+        ShinobuOnly = (Boolean) objects[5];
 
         try {
             conn = (HttpURLConnection) url.openConnection();
@@ -118,6 +124,7 @@ class GetTime extends AsyncTask<Object, Void, String> {
             @Override
             public void run() {
 
+                // System.out.println("noticetime : " + noticeTime);
                 diasArr = new ArrayList<>();
                 // 例: 08:30:00を08:30に変更するためのsplit用配列
                 String[] time;
@@ -152,19 +159,18 @@ class GetTime extends AsyncTask<Object, Void, String> {
                         // allのボタンが押された時
                         if (allButton) {
                             notice = true;
-                        }
-
-                        if (!clickIdArr.isEmpty()) {
+                        } else if (!clickIdArr.isEmpty()) {
                             // clickしたIdを通知
                             for (int j = 0; j < clickIdArr.size(); j++) {
                                 for (int k = 0; k < data.length(); k++) {
                                     if (k == clickIdArr.get(j)) {
                                         notice = true;
-                                        ;
                                     }
                                 }
                             }
                         }
+
+                        // System.out.println("notice : " + notice);
 
                         // trueなら通知する
                         if (notice) {
@@ -210,19 +216,41 @@ class GetTime extends AsyncTask<Object, Void, String> {
                         // 通知の判定をリセット
                         notice = false;
 
-                        // noteがある時だけnoteを表示
-                        if (data.getString("note").equals("null")) {
-                            diasArr.add(time[0] + ":" + time[1] + "  " + "@" + timeLag[0] + ":" + timeLag[1] + ":" + timeLag[2]);
+                        if(ShinobuOnly){
+                            if(data.getString("note").equals("忍ケ丘経由")) {
+                                if (ShinobuArrivalTime) {
+                                    //System.out.println("11111");
+                                    diasArr.add(time[0] + ":" + time[1] + "  " + "@" + timeLag[0] + ":" + timeLag[1] + ":" + timeLag[2]
+                                            + "  忍  " + "忍着 " + time[0] + ":" + String.valueOf((Integer.parseInt(time[1]) + 10)));
+                                } else {
+                                    //System.out.println("22222");
+                                    diasArr.add(time[0] + ":" + time[1] + "  " + "@" + timeLag[0] + ":"
+                                            + timeLag[1] + ":" + timeLag[2] + "  忍  ");
+                                }
+                            }
+                        }else if(data.getString("note").equals("忍ケ丘経由")) {
+                            if(ShinobuArrivalTime){
+                                //System.out.println("33333");
+                                diasArr.add(time[0] + ":" + time[1] + "  " + "@" + timeLag[0] + ":" + timeLag[1] + ":" + timeLag[2]
+                                        + "  忍  " + "忍着 " + time[0] + ":" + String.valueOf((Integer.parseInt(time[1]) + 10)));
+                            }else{
+                                //System.out.println("44444");
+                                diasArr.add(time[0] + ":" + time[1] + "  " + "@" + timeLag[0] + ":"
+                                        + timeLag[1] + ":" + timeLag[2] + "  忍  ");
+                            }
                         } else {
-                            diasArr.add(time[0] + ":" + time[1] + "  " + "@" + timeLag[0] + ":" + timeLag[1] + ":" + timeLag[2] + "  " + data.getString("note"));
+                            //System.out.println("55555");
+                            diasArr.add(time[0] + ":" + time[1] + "  " + "@" + timeLag[0] + ":" + timeLag[1] + ":" + timeLag[2]);
                         }
 
                     }
 
+                    /*
                     System.out.println("listLength: " + listLength);
                     System.out.println("diasArr.size(): " + diasArr.size());
                     System.out.println("clickIdArr.size():" + clickIdArr.size());
                     System.out.println("clickIdArr" + clickIdArr);
+                    */
 
                     // リスト数が増減した時，クリックしたリストIDの番号を変更する
                     if (listLength == -1) {
@@ -282,8 +310,8 @@ class GetTime extends AsyncTask<Object, Void, String> {
     }
 
     // 通知時間
-    void setNoticeTime(int minute) {
-        noticeTime = minute;
+    void setNoticeTime(int setMinute) {
+        noticeTime = setMinute;
     }
 
     // クリックしたIDがclickIdArrにあったら削除，なかったら追加する関数

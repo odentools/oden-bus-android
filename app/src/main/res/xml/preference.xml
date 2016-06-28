@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory android:title="通知時間" >
+        <ListPreference
+            android:key="defalutNoticeTime"
+            android:title="通知時間"
+            android:summary="起動時に通知する時間を設定"
+            android:entries="@array/DefaultNoticeTimeList"
+            android:entryValues="@array/DefaultNoticeTimeList"
+            android:defaultValue="\@10分"
+            android:dialogTitle="通知時間" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="忍ケ丘" >
+        <CheckBoxPreference
+            android:key="ShinobuOnly"
+            android:title="忍ケ丘経由だけを表示"
+            android:summary="バスの表示リストを忍ケ丘経由だけにする"
+            android:defaultValue="false" />
+        <CheckBoxPreference
+            android:key="ShinobuArrivalTime"
+            android:title="忍ケ丘到着時間"
+            android:summary="忍ケ丘に到着する時間を表示する"
+            android:defaultValue="false"/>
+    </PreferenceCategory>
+
+</PreferenceScreen>

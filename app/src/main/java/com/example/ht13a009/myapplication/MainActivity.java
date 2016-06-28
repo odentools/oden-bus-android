@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -84,6 +86,27 @@ public class MainActivity extends AppCompatActivity {
                 return false;
             }
         });
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu){
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    // メニューが選択された時の処理
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        // addしたときのIDで識別
+        switch (item.getItemId()) {
+            default:
+                return super.onOptionsItemSelected(item);
+            case R.id.action_settings:
+                Intent intent = new Intent(MainActivity.this, preferenceFragment.class);
+                startActivityForResult(intent, 0);
+                break;
+        }
+        return false;
     }
 
     public void loadAppsList(final ArrayAdapter adapter, HashMap<String, Integer> map){

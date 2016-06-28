@@ -1,6 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">OECU バス時刻表</string>
-    <string-array name="noticeTimeList">
+
+    <string-array name="DefaultNoticeTimeList">
         <item>\@1分</item>
         <item>\@3分</item>
         <item>\@5分</item>
@@ -9,5 +10,5 @@
         <item>\@30分</item>
         <item>\@1時間</item>
     </string-array>
-    <string name="action_settings">設定</string>
+
 </resources>

@@ -2,8 +2,10 @@ package com.example.ht13a009.myapplication;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
@@ -11,6 +13,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.net.MalformedURLException;
@@ -24,11 +27,20 @@ public class TimeActivity extends AppCompatActivity {
 
     private boolean allFlag = false;
     private HashMap<String, Integer> map;
+    private SharedPreferences prefs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_time);
+
+        TextView textView = (TextView) findViewById(R.id.textView);
+        // テキストビューのテキストを設定します
+        textView.setText("all通知：");
+
+        TextView textView2 = (TextView) findViewById(R.id.textView2);
+        // テキストビューのテキストを設定します
+        textView2.setText(" 通知時間：");
 
         // 現在のintentを取得する
         Intent intent = getIntent();
@@ -52,15 +64,18 @@ public class TimeActivity extends AppCompatActivity {
         ListView listView = (ListView) findViewById(R.id.listView2);
         listView.setAdapter(adapter);
 
+
+        prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        String defalutNoticeTime = prefs.getString("defalutNoticeTime", "@10分");
+
         // 通知時間を変更するアダプター
         final ArrayAdapter<CharSequence> noticeAdapter = ArrayAdapter.createFromResource(this,
-                R.array.noticeTimeList, android.R.layout.simple_spinner_item);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                R.array.noticeTimeList, R.layout.spinner_item);
+        adapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
         noticeSpinner.setAdapter(noticeAdapter);
         final int num = noticeAdapter.getCount();
-        final String noticeTimeDefault = getString(R.string.noticeTimeDefault);
         for (int i = 0; i < num; i ++) {
-            if (noticeAdapter.getItem(i).equals(noticeTimeDefault) == true) {
+            if (noticeAdapter.getItem(i).equals(defalutNoticeTime)) {
                 noticeSpinner.setSelection(i); // 選択初期設定
                 break;
             }
@@ -145,17 +160,7 @@ public class TimeActivity extends AppCompatActivity {
                 String myItem = (String) spinParent.getSelectedItem();
                 int myPosition = spinParent.getSelectedItemPosition();
 
-                String [] noticeTime = myItem.split("@");
-                String [] timeString;
-                int minute;
-
-                if(noticeTime[1].contains("分")){
-                    timeString = noticeTime[1].split("分");
-                    minute = Integer.parseInt(timeString[0]);
-                }else{
-                    timeString = noticeTime[1].split("時間");
-                    minute = Integer.parseInt(timeString[0]) * 60;
-                }
+                int minute = changeStoI(myItem);
 
                 task.setNoticeTime(minute);
 
@@ -198,12 +203,32 @@ public class TimeActivity extends AppCompatActivity {
 
         try {
             URL url = new URL("https://bus.oden.oecu.jp/api/1.3.1/Dias.json?route_id=" + id + "&date=" + sdf.format(date));
-            task.execute(url, TimeActivity.this, ui_handler, finally_runnable);
+            boolean ShinobuArrivalTime = prefs.getBoolean("ShinobuArrivalTime",false);
+            boolean ShinobuOnly = prefs.getBoolean("ShinobuOnly", false);
+
+            task.execute(url, TimeActivity.this, ui_handler, finally_runnable, ShinobuArrivalTime, ShinobuOnly);
 
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }
 
+    }
+
+    public int changeStoI(String s){
+
+        int i;
+        String [] stringNumber;
+        String[] sArr = s.split("@");
+
+        if(sArr[1].contains("分")){
+            stringNumber = sArr[1].split("分");
+            i = Integer.parseInt(stringNumber[0]);
+        }else{
+            stringNumber = sArr[1].split("時間");
+            i = Integer.parseInt(stringNumber[0]) * 60;
+        }
+
+        return i;
     }
 
 }

@@ -19,6 +19,11 @@
             </intent-filter>
         </activity>
         <activity android:name=".TimeActivity"></activity>
+        <activity
+            android:name=".preferenceFragment"
+            android:label="設定"
+            android:screenOrientation="portrait">
+        </activity>
     </application>
 
 </manifest>
