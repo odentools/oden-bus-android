@@ -33,6 +33,7 @@ public class TimeActivity extends AppCompatActivity {
 
     private boolean allFlag = false;
     private boolean singleFlag = false;
+    private String myItem;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,7 +42,7 @@ public class TimeActivity extends AppCompatActivity {
 
         TextView textView = (TextView) findViewById(R.id.textView);
         // テキストビューのテキストを設定します
-        textView.setText("all通知：");
+        textView.setText("   all通知：");
 
         TextView textView2 = (TextView) findViewById(R.id.textView2);
         // テキストビューのテキストを設定します
@@ -70,7 +71,8 @@ public class TimeActivity extends AppCompatActivity {
         listView.setAdapter(adapter);
 
         prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        String defalutNoticeTime = prefs.getString("defalutNoticeTime", "@10分");
+        //String defalutNoticeTime = prefs.getString("defalutNoticeTime", "@10分");
+        myItem = prefs.getString("defalutNoticeTime", "@10分");
 
         // 通知時間を変更するアダプター
         final ArrayAdapter<CharSequence> noticeAdapter = ArrayAdapter.createFromResource(this,
@@ -79,7 +81,7 @@ public class TimeActivity extends AppCompatActivity {
         noticeSpinner.setAdapter(noticeAdapter);
         final int num = noticeAdapter.getCount();
         for (int i = 0; i < num; i ++) {
-            if (noticeAdapter.getItem(i).equals(defalutNoticeTime)) {
+            if (noticeAdapter.getItem(i).equals(myItem)) {
                 noticeSpinner.setSelection(i); // 選択初期設定
                 break;
             }
@@ -152,7 +154,7 @@ public class TimeActivity extends AppCompatActivity {
                     // 色を薄水色に変更
                     //view.setBackgroundColor(getResources().getColor(R.color.lightBlue));
 
-                    Toast.makeText(getApplicationContext(), "通知on",
+                    Toast.makeText(getApplicationContext(), myItem + "後に通知します",
                             Toast.LENGTH_LONG).show();
                 }
 
@@ -207,7 +209,7 @@ public class TimeActivity extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 Spinner spinParent = (Spinner) parent;
-                String myItem = (String) spinParent.getSelectedItem();
+                myItem = (String) spinParent.getSelectedItem();
                 int myPosition = spinParent.getSelectedItemPosition();
 
                 int minute = changeStoI(myItem);
