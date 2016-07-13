@@ -1,7 +1,9 @@
 package com.example.ht13a009.myapplication;
 
 import android.app.Notification;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.os.Handler;
 import android.support.v4.app.NotificationCompat;
@@ -35,17 +37,18 @@ public class TimeArrayAdapter extends ArrayAdapter<JSONObject> {
     private boolean ShinobuOnly;
 
     private String route;
+    private int id;
 
-    private String year;
-    private String month;
-    private String day;
+    private String year = null;
+    private String month = null;
+    private String day = null;
 
     /**
      * コンストラクタ
      * @param context コンテキスト
      * @param resource リストの行のレイアウト
      */
-    public TimeArrayAdapter(Context context, int resource, boolean shinobu_arrival_time, boolean shinobu_only, String Route) {
+    public TimeArrayAdapter(Context context, int resource, boolean shinobu_arrival_time, boolean shinobu_only, String Route, int routeid) {
         super(context, resource);
 
         mContext = context;
@@ -53,6 +56,7 @@ public class TimeArrayAdapter extends ArrayAdapter<JSONObject> {
         ShinobuArrivalTime = shinobu_arrival_time;
         ShinobuOnly = shinobu_only;
         route = Route;
+        id = routeid;
 
         // 定期更新を開始
         mHandler = new Handler();
@@ -74,7 +78,7 @@ public class TimeArrayAdapter extends ArrayAdapter<JSONObject> {
                 while (0 < getCount()) {
 
                     JSONObject data = getItem(0);
-                    if (!data.isNull("isDummy")) { // ダミーのオブジェクトなら何もしない
+                    if (!data.isNull("dummy")) { // ダミーのオブジェクトなら何もしない
                         break;
                     }
                     
@@ -189,6 +193,8 @@ public class TimeArrayAdapter extends ArrayAdapter<JSONObject> {
 
         for (int i = 0; i < getCount(); i++){
 
+            if (datas[i].isNull("departureDate")) continue;
+
             Date date_dep = null;
             try {
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
@@ -203,9 +209,22 @@ public class TimeArrayAdapter extends ArrayAdapter<JSONObject> {
 
             try {
                 // デバッグ用
-                //if (!datas[i].isNull("alarm") && datas[i].getBoolean("alarm") && noticeTime == ( (60 * 5 + 11) * 60)){
-                if (!datas[i].isNull("alarm") && datas[i].getBoolean("alarm") && noticeTime == (preNoticeTime * 60)){
+                if (!datas[i].isNull("alarm") && datas[i].getBoolean("alarm") && noticeTime == ( (60 * 7 + 25) * 60)){
+                    //System.out.println("!datas[" + i + "].isNull(\"alarm\"):" + !datas[i].isNull("alarm"));
+                    //System.out.println("datas[" + i + "].getBoolean(\"alarm\"): " + datas[i].getBoolean("alarm"));
+                //if (!datas[i].isNull("alarm") && datas[i].getBoolean("alarm") && noticeTime == (preNoticeTime * 60)){
+
+                    Intent intent = new Intent(mContext, TimeActivity.class);
+
+                    intent.putExtra("Route", route);
+                    intent.putExtra("id", id);
+
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TASK);
+
+                    PendingIntent pendingIntent = PendingIntent.getActivity(mContext, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
                     NotificationCompat.Builder builder = new NotificationCompat.Builder(mContext);
+                    builder.setContentIntent(pendingIntent);
                     builder.setSmallIcon(R.mipmap.oecu_bus_background_transmission);
                     builder.setLargeIcon(BitmapFactory.decodeResource(mContext.getResources(), R.mipmap.oecu_bus));
                     // アイコンの背景色
@@ -213,7 +232,7 @@ public class TimeArrayAdapter extends ArrayAdapter<JSONObject> {
 
                     if(preNoticeTime >= 60){
                         builder.setContentTitle(route);
-                        builder.setContentText("バス発車まで残り" + preNoticeTime/60 + "時間です．");
+                        builder.setContentText("バス発車まで残り" + preNoticeTime / 60 + "時間です．");
                     }else{
                         builder.setContentTitle(route);
                         builder.setContentText("バス発車まで残り" + preNoticeTime + "分です．");
@@ -230,6 +249,7 @@ public class TimeArrayAdapter extends ArrayAdapter<JSONObject> {
                     NotificationManagerCompat manager = NotificationManagerCompat.from(mContext);
                     manager.notify(notificationId, builder.build());
                 }
+
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -270,7 +290,7 @@ public class TimeArrayAdapter extends ArrayAdapter<JSONObject> {
             System.out.println("sdf_now.format(date_now): " + sdf_now.format(date_now));
             System.out.println("compareTo: " + sdf_now.format(date_now).compareTo(pickerDate));
 
-            if (sdf_now.format(date_now).compareTo(pickerDate) >= 0){
+            if (sdf_now.format(date_now).compareTo(pickerDate) >= 0 || (year == null && month == null & day == null) ){
                 tv_sales_end.setText("本日の営業は終了しました");
             }else {
                 tv_sales_end.setText("未実装です");

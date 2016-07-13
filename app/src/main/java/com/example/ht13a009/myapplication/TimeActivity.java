@@ -76,7 +76,7 @@ public class TimeActivity extends AppCompatActivity implements DatePickerDialog.
         boolean ShinobuOnly = prefs.getBoolean("ShinobuOnly", false);
 
         // アダプタを生成してリストビューへセット
-        adapter = new TimeArrayAdapter(this, R.layout.row, ShinobuArrivalTime, ShinobuOnly, Route);
+        adapter = new TimeArrayAdapter(this, R.layout.row, ShinobuArrivalTime, ShinobuOnly, Route, routeId);
         listView = (ListView) findViewById(R.id.listView2);
         listView.setAdapter(adapter);
 
