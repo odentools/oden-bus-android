@@ -209,10 +209,10 @@ public class TimeArrayAdapter extends ArrayAdapter<JSONObject> {
 
             try {
                 // デバッグ用
-                if (!datas[i].isNull("alarm") && datas[i].getBoolean("alarm") && noticeTime == ( (60 * 7 + 25) * 60)){
+                //if (!datas[i].isNull("alarm") && datas[i].getBoolean("alarm") && noticeTime == ( (60 * 7 + 25) * 60)){
                     //System.out.println("!datas[" + i + "].isNull(\"alarm\"):" + !datas[i].isNull("alarm"));
                     //System.out.println("datas[" + i + "].getBoolean(\"alarm\"): " + datas[i].getBoolean("alarm"));
-                //if (!datas[i].isNull("alarm") && datas[i].getBoolean("alarm") && noticeTime == (preNoticeTime * 60)){
+                if (!datas[i].isNull("alarm") && datas[i].getBoolean("alarm") && noticeTime == (preNoticeTime * 60)){
 
                     Intent intent = new Intent(mContext, TimeActivity.class);
 
