@@ -1,18 +1,21 @@
 package com.example.ht13a009.myapplication;
 
+import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
+import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
+import android.widget.DatePicker;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -22,18 +25,24 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashMap;
 
-public class TimeActivity extends AppCompatActivity {
+public class TimeActivity extends AppCompatActivity implements DatePickerDialog.OnDateSetListener {
 
-    private HashMap<String, Integer> map;
     private SharedPreferences prefs;
-    private ImageView appInfoImage;
     private ListView listView;
 
     private boolean allFlag = false;
-    private boolean singleFlag = false;
     private String myItem;
+    private static final int ACTION_ID = 0;
+
+    private TimeArrayAdapter adapter;
+    private GetTime task;
+    private String Route;
+    private int routeId;
+
+    private String stringYear = null;
+    private String stringMonth = null;
+    private String stringDay = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,25 +61,25 @@ public class TimeActivity extends AppCompatActivity {
         Intent intent = getIntent();
 
         // intentから指定キーの文字列を取得する
-        String Route = intent.getStringExtra("Route");
-        int id = intent.getIntExtra("id", -1);
+        Route = intent.getStringExtra("Route");
+        routeId = intent.getIntExtra("id", -1);
 
         // Windowのタイトルを変更する
         setTitle(Route);
-
-        map = new HashMap<String, Integer>();
 
         // activity_time.xmlに設定したコンポーネントをid指定で取得します。
         Button allButton = (Button) findViewById(R.id.allButton);
         final Spinner noticeSpinner = (Spinner) findViewById(R.id.noticeSpinner);
 
+        prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        boolean ShinobuArrivalTime = prefs.getBoolean("ShinobuArrivalTime", false);
+        boolean ShinobuOnly = prefs.getBoolean("ShinobuOnly", false);
+
         // アダプタを生成してリストビューへセット
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>
-                (this, R.layout.row, R.id.row_textview1);
+        adapter = new TimeArrayAdapter(this, R.layout.row, ShinobuArrivalTime, ShinobuOnly, Route);
         listView = (ListView) findViewById(R.id.listView2);
         listView.setAdapter(adapter);
 
-        prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         //String defalutNoticeTime = prefs.getString("defalutNoticeTime", "@10分");
         myItem = prefs.getString("defalutNoticeTime", "@10分");
 
@@ -80,15 +89,14 @@ public class TimeActivity extends AppCompatActivity {
         adapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
         noticeSpinner.setAdapter(noticeAdapter);
         final int num = noticeAdapter.getCount();
-        for (int i = 0; i < num; i ++) {
+        for (int i = 0; i < num; i++) {
             if (noticeAdapter.getItem(i).equals(myItem)) {
                 noticeSpinner.setSelection(i); // 選択初期設定
                 break;
             }
         }
 
-        final GetTime task = new GetTime(adapter, getApplicationContext(), Route);
-        loadTimeList(task, id);
+        loadTimeList();
 
         // allボタン押した時全部の通知
         assert allButton != null;
@@ -98,32 +106,28 @@ public class TimeActivity extends AppCompatActivity {
 
                 if (allFlag) {
                     allFlag = false;
-                    task.setAllButton(allFlag);
 
-                    // ベルのアイコンをlistViewの全てのviewで表示
-                    for(int i = 0; i < listView.getChildCount(); i++){
-                        LinearLayout linearLayout = (LinearLayout)listView.getChildAt(i);
-                        linearLayout.findViewById(R.id.row_imageview).setVisibility(View.INVISIBLE);
+                    // ベルのアイコンをlistViewの全てのviewで非表示
+                    for (int i = 0; i < listView.getChildCount(); i++) {
+                       adapter.setAlarm(i, false);
                     }
 
                     Toast.makeText(getApplicationContext(), "全ての通知をoff",
                             Toast.LENGTH_LONG).show();
+
                 } else {
                     allFlag = true;
-                    task.setAllButton(allFlag);
-                    task.setClickIdAll();
 
                     // ベルのアイコンをlistViewの全てのviewで表示
-                    for(int i = 0; i < listView.getChildCount(); i++){
-                        LinearLayout linearLayout = (LinearLayout)listView.getChildAt(i);
-                        linearLayout.findViewById(R.id.row_imageview).setVisibility(View.VISIBLE);
-                        linearLayout.performClick();
+                    for (int i = 0; i < listView.getChildCount(); i++) {
+                        adapter.setAlarm(i, true);
                     }
 
                     Toast.makeText(getApplicationContext(), "全ての通知をon",
                             Toast.LENGTH_LONG).show();
-                    ;
+
                 }
+
             }
         });
 
@@ -132,30 +136,10 @@ public class TimeActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> list, View view, int position, long id) {
 
-                System.out.println("position: " + position);
-
-                // クリックされたポジションをGetTime.javaに渡す
-                singleFlag = task.setClickId(position);
-                if (singleFlag) {
-
-                    // アイコンを非表示
-                    appInfoImage = (ImageView)view.findViewById(R.id.row_imageview);
-                    appInfoImage.setVisibility(View.INVISIBLE);
-                    // 色を白色に変更
-                    //view.setBackgroundColor(getResources().getColor(R.color.white));
-
-                    Toast.makeText(getApplicationContext(), "通知off",
-                            Toast.LENGTH_LONG).show();
+                if (adapter.toggleAlarm(position)) {
+                    Toast.makeText(getApplicationContext(), myItem + "前に通知します", Toast.LENGTH_LONG).show();
                 } else {
-
-                    // アイコンを表示
-                    appInfoImage = (ImageView)view.findViewById(R.id.row_imageview);
-                    appInfoImage.setVisibility(View.VISIBLE);
-                    // 色を薄水色に変更
-                    //view.setBackgroundColor(getResources().getColor(R.color.lightBlue));
-
-                    Toast.makeText(getApplicationContext(), myItem + "後に通知します",
-                            Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(), myItem + "前の通知はやめました", Toast.LENGTH_LONG).show();
                 }
 
             }
@@ -166,23 +150,11 @@ public class TimeActivity extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
-                /*
-                ListView listView = (ListView) parent;
-                String item = (String) listView.getItemAtPosition(position);
-                Toast.makeText(getApplicationContext(), item + " selected",
-                        Toast.LENGTH_LONG).show();
-                */
-
             }
 
             //リスト項目がなにも選択されていない時の処理
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-
-                /*
-                Toast.makeText(getApplicationContext(), "no item selected",
-                        Toast.LENGTH_LONG).show();
-                */
 
             }
         });
@@ -191,16 +163,7 @@ public class TimeActivity extends AppCompatActivity {
         listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-
-                /*
-                ListView listView = (ListView) parent;
-                String item = (String) listView.getItemAtPosition(position);
-                Toast.makeText(getApplicationContext(), item + " long clicked",
-                        Toast.LENGTH_LONG).show();
-                */
-
                 return false;
-
             }
         });
 
@@ -214,10 +177,10 @@ public class TimeActivity extends AppCompatActivity {
 
                 int minute = changeStoI(myItem);
 
-                task.setNoticeTime(minute);
+                adapter.setPreNoticeTime(minute);
 
                 Toast.makeText(getApplicationContext(),
-                        myItem  , Toast.LENGTH_SHORT).show();
+                        myItem, Toast.LENGTH_SHORT).show();
 
             }
 
@@ -229,7 +192,50 @@ public class TimeActivity extends AppCompatActivity {
         });
     }
 
-    public void loadTimeList(final GetTime task, int id){
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+
+        // カレンダーアイコンの追加
+        MenuItem actionItem = menu.add(Menu.NONE, ACTION_ID, Menu.NONE, "Action Button");
+        actionItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+        actionItem.setIcon(R.drawable.calendar);
+
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        switch (item.getItemId()) {
+            case ACTION_ID:
+
+                DialogFragment newFragment = new DatePick();
+                newFragment.show(getSupportFragmentManager(), "datePicker");
+
+                return true;
+        }
+        return false;
+    }
+
+    @Override
+    public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+
+        stringYear = String.valueOf(year);
+        stringMonth = String.valueOf(monthOfYear + 1);
+        stringDay = String.valueOf(dayOfMonth);
+
+        loadTimeList();
+        adapter.setDate(stringYear, stringMonth, stringDay);
+
+    }
+
+    public void loadTimeList() {
+
+        if(task != null){
+            task.cancel(true);
+        }
+
+        task = new GetTime(adapter);
 
         // 現在の時刻を取得
         Date date = new Date();
@@ -254,11 +260,15 @@ public class TimeActivity extends AppCompatActivity {
         };
 
         try {
-            URL url = new URL("https://bus.oden.oecu.jp/api/1.3.1/Dias.json?route_id=" + id + "&date=" + sdf.format(date));
-            boolean ShinobuArrivalTime = prefs.getBoolean("ShinobuArrivalTime",false);
-            boolean ShinobuOnly = prefs.getBoolean("ShinobuOnly", false);
+            URL url;
+            if (stringYear != null && stringMonth != null && stringDay != null) {
+                url = new URL("https://bus.oden.oecu.jp/api/1.3.1/Dias.json?route_id=" + routeId + "&date="
+                        + stringYear + "/" + stringMonth + "/" + stringDay);
+            } else {
+                url = new URL("https://bus.oden.oecu.jp/api/1.3.1/Dias.json?route_id=" + routeId + "&date=" + sdf.format(date));
+            }
 
-            task.execute(url, TimeActivity.this, ui_handler, finally_runnable, ShinobuArrivalTime, ShinobuOnly);
+            task.execute(url, ui_handler, finally_runnable);
 
         } catch (MalformedURLException e) {
             e.printStackTrace();
@@ -266,16 +276,16 @@ public class TimeActivity extends AppCompatActivity {
 
     }
 
-    public int changeStoI(String s){
+    public int changeStoI(String s) {
 
         int i;
-        String [] stringNumber;
+        String[] stringNumber;
         String[] sArr = s.split("@");
 
-        if(sArr[1].contains("分")){
+        if (sArr[1].contains("分")) {
             stringNumber = sArr[1].split("分");
             i = Integer.parseInt(stringNumber[0]);
-        }else{
+        } else {
             stringNumber = sArr[1].split("時間");
             i = Integer.parseInt(stringNumber[0]) * 60;
         }

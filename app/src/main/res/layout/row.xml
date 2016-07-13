@@ -6,13 +6,38 @@
     android:background="@color/list_item">
 
     <TextView
-        android:id="@+id/row_textview1"
+        android:id="@+id/row_textview_time"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:textSize="19sp"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:padding="10dip" />
+
+    <TextView
+        android:id="@+id/row_textview_rem_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:textSize="17sp"
         android:padding="10dip"
-        />
+        android:layout_gravity="left"/>
+
+    <TextView
+        android:id="@+id/row_textview_shinobu"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:textSize="17sp"
+        android:padding="10dip" />
+
+    <TextView
+        android:id="@+id/row_textview_shinobu_arrival"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:textSize="17sp"
+        android:padding="10dip" />
 
     <ImageView
         android:id="@+id/row_imageview"
