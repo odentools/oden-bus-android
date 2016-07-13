@@ -1,4 +1,4 @@
-package com.example.ht13a009.myapplication;
+package jp.oecu.oden.bus.android;
 
 import android.app.Notification;
 import android.app.PendingIntent;
