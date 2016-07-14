@@ -26,8 +26,6 @@ import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import jp.oecu.oden.bus.myapplication.R;
-
 public class TimeActivity extends AppCompatActivity implements DatePickerDialog.OnDateSetListener {
 
     private SharedPreferences prefs;

@@ -5,8 +5,6 @@ import android.preference.PreferenceFragment;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 
-import jp.oecu.oden.bus.myapplication.R;
-
 public class preferenceFragment extends AppCompatActivity {
 
     @Override
